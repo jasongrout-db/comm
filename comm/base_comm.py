@@ -63,7 +63,7 @@ class BaseComm:
     def __del__(self):
         """trigger close on gc"""
         print("Closing comm on gc")
-        self.close(deleting=True)
+        self.close(metadata={'reason': 'garbage collection'}, deleting=True)
 
     # publishing messages
 
@@ -246,7 +246,7 @@ class CommManager:
         # Failure.
         try:
             print("Closing comm in comm_open")
-            comm.close()
+            comm.close(metadata={'reason': 'failure to open'})
         except Exception:
             logger.error(
                 """Could not close comm during `comm_open` failure
