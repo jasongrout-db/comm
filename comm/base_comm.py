@@ -62,6 +62,7 @@ class BaseComm:
 
     def __del__(self):
         """trigger close on gc"""
+        print("Closing comm on gc")
         self.close(deleting=True)
 
     # publishing messages
@@ -229,18 +230,22 @@ class CommManager:
             primary=False,
             target_name=target_name,
         )
+        # why are we creating and registering the comm before we find out if the target exists???
         self.register_comm(comm)
         if f is None:
+            print("No such comm target registered: %s", target_name)
             logger.error("No such comm target registered: %s", target_name)
         else:
             try:
                 f(comm, msg)
                 return
             except Exception:
+                print("Exception opening comm with target: %s", target_name)
                 logger.error("Exception opening comm with target: %s", target_name, exc_info=True)
 
         # Failure.
         try:
+            print("Closing comm in comm_open")
             comm.close()
         except Exception:
             logger.error(
